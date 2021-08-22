@@ -1,4 +1,4 @@
-from flask import Flask, request
+from fastapi import FastAPI, Request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -11,11 +11,11 @@ import services
 
 orm.start_mappers()
 get_session = sessionmaker(bind=create_engine(config.get_postgres_uri()))
-app = Flask(__name__)
+app = FastAPI()
 
 
-@app.route("/allocate", methods=["POST"])
-def allocate_endpoint():
+@app.post("/allocate")
+def allocate_endpoint(request: Request):
     session = get_session()
     repo = repository.SqlAlchemyRepository(session)
     line = model.OrderLine(
