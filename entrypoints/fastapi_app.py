@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, request
+from fastapi import FastAPI, Request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -10,11 +10,11 @@ from service_layer import services
 
 orm.start_mappers()
 get_session = sessionmaker(bind=create_engine(config.get_postgres_uri()))
-app = Flask(__name__)
+app = FastAPI()
 
 
-@app.route("/add_batch", methods=["POST"])
-def add_batch():
+@app.post("/add_batch")
+def add_batch(request: Request):
     session = get_session()
     repo = repository.SqlAlchemyRepository(session)
     eta = request.json["eta"]
@@ -31,8 +31,8 @@ def add_batch():
     return "OK", 201
 
 
-@app.route("/allocate", methods=["POST"])
-def allocate_endpoint():
+@app.post("/allocate")
+def allocate_endpoint(request: Request):
     session = get_session()
     repo = repository.SqlAlchemyRepository(session)
     try:
