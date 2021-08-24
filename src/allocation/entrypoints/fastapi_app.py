@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Flask, request
+from fastapi import FastAPI, Request
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -7,12 +7,12 @@ from allocation.domain import model
 from allocation.adapters import orm
 from allocation.service_layer import services, unit_of_work
 
-app = Flask(__name__)
+app = FastAPI()
 orm.start_mappers()
 
 
-@app.route("/add_batch", methods=["POST"])
-def add_batch():
+@app.post("/add_batch")
+def add_batch(request: Request):
     eta = request.json["eta"]
     if eta is not None:
         eta = datetime.fromisoformat(eta).date()
@@ -26,8 +26,8 @@ def add_batch():
     return "OK", 201
 
 
-@app.route("/allocate", methods=["POST"])
-def allocate_endpoint():
+@app.post("/allocate")
+def allocate_endpoint(request: Request):
     try:
         batchref = services.allocate(
             request.json["orderid"],
