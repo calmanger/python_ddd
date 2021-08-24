@@ -1,6 +1,7 @@
-FROM python:3.8-alpine
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8-alpine3.10
 
-RUN apk add --no-cache --virtual .build-deps gcc postgresql-dev musl-dev python3-dev
+# building greenlet needs g++ and make
+RUN apk add --no-cache --virtual .build-deps gcc g++ make postgresql-dev musl-dev python3-dev
 RUN apk add libpq
 
 COPY requirements.txt /tmp/
@@ -14,5 +15,5 @@ RUN pip install -e /src
 COPY tests/ /tests/
 
 WORKDIR /src
-ENV FLASK_APP=allocation/entrypoints/flask_app.py FLASK_DEBUG=1 PYTHONUNBUFFERED=1
-CMD flask run --host=0.0.0.0 --port=80
+ENV PYTHONUNBUFFERED=1
+CMD ["uvicorn", "allocation.entrypoints.fastapi_app:app", "--host", "0.0.0.0", "--port", "80"]
