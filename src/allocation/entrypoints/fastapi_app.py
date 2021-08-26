@@ -1,15 +1,15 @@
 from datetime import datetime
-from flask import Flask, jsonify, request
+from fastapi import FastAPI, Request
 from allocation.domain import commands
 from allocation.service_layer.handlers import InvalidSku
 from allocation import bootstrap, views
 
-app = Flask(__name__)
+app = FastAPI()
 bus = bootstrap.bootstrap()
 
 
-@app.route("/add_batch", methods=["POST"])
-def add_batch():
+@app.post("/add_batch")
+def add_batch(request: Request):
     eta = request.json["eta"]
     if eta is not None:
         eta = datetime.fromisoformat(eta).date()
@@ -20,8 +20,8 @@ def add_batch():
     return "OK", 201
 
 
-@app.route("/allocate", methods=["POST"])
-def allocate_endpoint():
+@app.post("/allocate")
+def allocate_endpoint(request: Request):
     try:
         cmd = commands.Allocate(
             request.json["orderid"], request.json["sku"], request.json["qty"]
@@ -33,9 +33,9 @@ def allocate_endpoint():
     return "OK", 202
 
 
-@app.route("/allocations/<orderid>", methods=["GET"])
-def allocations_view_endpoint(orderid):
+@app.get("/itemsallocations/{orderid}")
+def allocations_view_endpoint(orderid: int):
     result = views.allocations(orderid, bus.uow)
     if not result:
         return "not found", 404
-    return jsonify(result), 200
+    return result, 200
