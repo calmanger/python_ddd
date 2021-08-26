@@ -1,4 +1,4 @@
-FROM python:3.9-slim-buster
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
 
 # RUN apt install gcc libpq (no longer needed bc we use psycopg2-binary)
 
@@ -11,5 +11,5 @@ RUN pip install -e /src
 COPY tests/ /tests/
 
 WORKDIR /src
-ENV FLASK_APP=allocation/entrypoints/flask_app.py FLASK_DEBUG=1 PYTHONUNBUFFERED=1
-CMD flask run --host=0.0.0.0 --port=80
+ENV PYTHONUNBUFFERED=1
+CMD ["uvicorn", "allocation.entrypoints.fastapi_app:app", "--host", "0.0.0.0", "--port", "80"]
