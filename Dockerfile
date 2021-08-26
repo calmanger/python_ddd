@@ -1,6 +1,7 @@
-FROM python:3.7-alpine
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8-alpine3.10
 
-RUN apk add --no-cache --virtual .build-deps gcc postgresql-dev musl-dev python3-dev
+# building greenlet needs g++ and make
+RUN apk add --no-cache --virtual .build-deps gcc g++ postgresql-dev musl-dev python3-dev
 RUN apk add libpq
 
 COPY requirements.txt /tmp/

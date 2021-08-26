@@ -1,13 +1,13 @@
 from datetime import datetime
-from flask import Flask, jsonify, request
+from fastapi import FastAPI, Request
 from allocation import events, exceptions, messagebus, orm, unit_of_work
 
-app = Flask(__name__)
+app = FastAPI()
 orm.start_mappers()
 
 
-@app.route("/add_batch", methods=['POST'])
-def add_batch():
+@app.post("/add_batch")
+def add_batch(request: Request):
     eta = request.json['eta']
     if eta is not None:
         eta = datetime.fromisoformat(eta).date()
@@ -18,8 +18,8 @@ def add_batch():
     return 'OK', 201
 
 
-@app.route("/allocate", methods=['POST'])
-def allocate_endpoint():
+@app.post("/allocate")
+def allocate_endpoint(request: Request):
     try:
         event = events.AllocationRequest(
             request.json['orderid'], request.json['sku'], request.json['qty'],
@@ -27,6 +27,6 @@ def allocate_endpoint():
         results = messagebus.handle([event], unit_of_work.SqlAlchemyUnitOfWork())
         batchref = results.pop()
     except exceptions.InvalidSku as e:
-        return jsonify({'message': str(e)}), 400
+        return {'message': str(e)}, 400
 
-    return jsonify({'batchref': batchref}), 201
+    return {'batchref': batchref}, 201
