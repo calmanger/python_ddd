@@ -8,6 +8,7 @@ If you want to try and code along with a chapter,
 you'll want to check out the branch for the previous chapter.
 
 https://github.com/cosmicpython/code/branches/all
+https://florian-kromer.medium.com/fastapi-microservice-patterns-domain-driven-design-e99f6f475691
 
 
 ## Exercises
